@@ -22,3 +22,23 @@ exports.helloWorld = functions.database.ref('notification/{id}').onWrite(evt => 
         }
     });
 });
+// get update and token
+exports.notifyOwner = functions.firestore.document('/fcm-token/{fcm-token}').onWrite((change, context) => {
+  const beforeData = change.before.val();
+  const afterData = change.after.val();
+
+  let id = context.params["fcm-token"]
+  console.log(afterData);
+  console.log(id);
+
+//  const payload = {
+//      notification: {
+//        messsage : 'No Tow',
+//        timestamp : afterData,
+//      }
+//  };
+
+  // get fcm-token
+//  admin.firestore.document('/fcm-token/');
+//  return admin.messaging().sendToDevice(token, payload);
+});
