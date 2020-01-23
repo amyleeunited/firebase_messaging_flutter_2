@@ -58,7 +58,7 @@ exports.makeUppercase = functions.database.ref('/messages/{pushId}/original')
         });
 
 
-    exports.notifyOwner = functions.firestore
+    exports.notifyOwner2 = functions.firestore
         .document('fcm_token/{fcm_token}/{subcollector}/{subdocument}')
         .onWrite((change, context) => {
             console.log(change.after.data());
@@ -69,9 +69,21 @@ exports.makeUppercase = functions.database.ref('/messages/{pushId}/original')
             console.log(context.params.subcollector);
             console.log(context.params.subdocument);
             console.log(owner);
+            });
+
+    exports.notifyOwner = functions.firestore
+        .document('fcm_token/{fcm_token}')
+        .onWrite((change, context) => {
+            console.log(change.after.data());
+            const notification = change.after.data();
+            const owner = context.params.fcm_token;
+            console.log(notification);
+//            console.log(notification["message/8Cc0R4m4aROYaOF9GrQo/slogan"]);
+            console.log(owner);
 
                         const payload = {
-                            notification:{title:"Will this  work?", body:notification["slogan"], data: "must be string too"},
+//                            notification:{title:"Will this  work?", body:notification["message/8Cc0R4m4aROYaOF9GrQo/slogan"], data: "must be string too"},
+                            notification:{title:"Will this  work?", body:notification['sports'], data: "must be string too"},
                         };
 
 //            owner='e8iKEom59bY:APA91bGyf2JGPtvPo-7nylkNcOkiRHWr22XgVMRkpEXHljgsUua4Wn5oWX7Vb6p5HCKQ_XIaQsmo-xWQe3KUw8TwXbyxyzsHZVraY1lYq5Zp8JHzS1FJZnKvgoVrgOPhEs0o61ZTXwDN';

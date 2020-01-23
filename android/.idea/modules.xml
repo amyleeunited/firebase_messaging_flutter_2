@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/android.iml" filepath="$PROJECT_DIR$/android.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/cloud_firestore-0.13.0+1/android/cloud_firestore.iml" filepath="C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/cloud_firestore-0.13.0+1/android/cloud_firestore.iml" />
+      <module fileurl="file://C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.4.1+4/android/device_info.iml" filepath="C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/device_info-0.4.1+4/android/device_info.iml" />
       <module fileurl="file://C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core-0.4.3+2/android/firebase_core.iml" filepath="C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core-0.4.3+2/android/firebase_core.iml" />
       <module fileurl="file://C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_web-0.1.1+2/android/firebase_core_web.iml" filepath="C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_core_web-0.1.1+2/android/firebase_core_web.iml" />
       <module fileurl="file://C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_database-3.1.1/android/firebase_database.iml" filepath="C:/Program Files/flutter/.pub-cache/hosted/pub.dartlang.org/firebase_database-3.1.1/android/firebase_database.iml" />
