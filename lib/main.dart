@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:device_info/device_info.dart';
 
 import 'package:quiver/strings.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 //void main() => runApp(new MyApp());
 void main() => runApp(new MaterialApp(home: new MyApp()));
@@ -26,6 +27,12 @@ class _MyAppState extends State<MyApp> {
   String _homeScreenText = "Waiting for token...";
   String fcmtoken;
   String fcmTokenLocal;
+
+// TODO: getToken()
+  final databaseReference = Firestore.instance;
+  String token;
+
+  bool _hover = false;
 
   @override
   void initState() {
@@ -71,15 +78,14 @@ class _MyAppState extends State<MyApp> {
 
   showNotification(Map<String, dynamic> msg) async {
     var android = new AndroidNotificationDetails(
-      'sdffds dsffds',
-      "CHANNLE NAME",
-      "channelDescription",
-    );
+        'channel id', 'channel NAME', 'CHANNEL DESCRIPTION',
+        priority: Priority.High, importance: Importance.Max);
     var iOS = new IOSNotificationDetails();
     var platform = new NotificationDetails(android, iOS);
     await flutterLocalNotificationsPlugin.show(
-        0, "This is title", "this is notification demo", platform,
-        payload: msg['msg']);
+        0, 'No Tow', 'Please move your car', platform,
+        payload: msg['notification']['body']);
+    print('msg is: ' + msg.toString());
   }
 
   Future onSelectNotification(String payload) async {
@@ -90,49 +96,16 @@ class _MyAppState extends State<MyApp> {
         return new AlertDialog(
           title: Text("Notification"),
           content: Text("Payload : $payload"),
+          actions: <Widget>[
+            FlatButton(
+              child: Text("OK"),
+              onPressed: () => Navigator.pop(context),
+            )
+          ],
         );
       },
     );
   }
-
-  Widget _showDialog() {
-    showDialog(
-      context: context,
-      builder: (_) {
-        return new AlertDialog(
-          title: Text("Notification"),
-          content: Text("Payload : Testing..."),
-        );
-      },
-    );
-  }
-
-  showAlertDialog(BuildContext context) {
-
-    // set up the button
-    Widget okButton = FlatButton(
-      child: Text("OK"),
-      onPressed: () { },
-    );
-
-    // set up the AlertDialog
-    AlertDialog alert = AlertDialog(
-      title: Text("My title"),
-      content: Text("This is my message."),
-      actions: [
-        okButton,
-      ],
-    );
-
-    // show the dialog
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return alert;
-      },
-    );
-  }
-
 
   update(String token) {
     print(token);
@@ -142,91 +115,21 @@ class _MyAppState extends State<MyApp> {
     setState(() {});
   }
 
-// TODO: getToken()
-  final databaseReference = Firestore.instance;
-  String token;
-
-  getToken() {
-    firebaseMessaging.getToken().then((fcm_token) {
-      token = fcm_token;
-      print("fcm_token = " + token);
-      databaseReference.collection("fcm_token").document("1").setData({
-        'fcm_token': token,
-      });
-    });
-
-    setState(() {});
-  }
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
-        appBar: new AppBar(
-          title: new Text('Push Notification'),
-        ),
-        body: new Center(
-          child: new Column(
-            children: <Widget>[
-              if (false)
-                new Text(
-                  textValue,
-                ),
-              if (false)
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: RaisedButton(
-                        child: Text('Create Record'),
-                        onPressed: () {
-                          createRecord();
-                          getToken();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RaisedButton(
-                        child: Text('View Record'),
-                        onPressed: () {
-                          getData();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RaisedButton(
-                        child: Text('Update Record'),
-                        onPressed: () {
-                          updateData();
-                        },
-                      ),
-                    ),
-                    Expanded(
-                      child: RaisedButton(
-                        child: Text('Delete Record'),
-                        onPressed: () {
-                          deleteData();
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: RaisedButton(
-                      child: Text('Add Record'),
-                      onPressed: () {
-                        addData();
-                      },
-                    ),
-                  ),
-                  Expanded(
-                    child: RaisedButton(
-                      child: Text('Get Device Info'),
-                      onPressed: () {
-                        getDeviceInfo();
-                      },
-                    ),
-                  ),
+      appBar: new AppBar(
+        title: new Text('No Tow'),
+      ),
+      body: new Center(
+        child: new Column(
+          children: <Widget>[
+            SizedBox(
+              height: 20,
+            ),
+            Row(
+              children: <Widget>[
+                if (false)
                   Expanded(
                     child: RaisedButton(
                       child: Text('Get Owner'),
@@ -235,108 +138,70 @@ class _MyAppState extends State<MyApp> {
                       },
                     ),
                   ),
-                  Expanded(
-                    child: RaisedButton(
-                      child: Text('Notify'),
-                      onPressed: () {
-                        showNotification({
-                          'msg':
-                              'Just testing flutter local notification plugin'
-                        });
-                      },
+              ],
+            ),
+            Container(
+              child: TextField(
+                controller: myController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  labelText: 'License Plate',
+                ),
+              ),
+            ),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: <Widget>[
+                  RaisedButton(
+                    child: Text('Add/Edit License Plate Number'),
+                    onPressed: () {
+                      createData();
+                    },
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
                     ),
                   ),
-                ],
-              ),
-              Container(
-                child: TextField(
-                  controller: myController,
-                  decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    labelText: 'License Plate',
-                  ),
-                ),
-              ),
-              Row(children: <Widget>[
-                Expanded(
-                  child: RaisedButton(
-                    child: Text('Add My License Plate Number'),
-                    onPressed: () {
-                      addMyData();
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _hover = true;
+                      });
                     },
+                    child: RaisedButton(
+                      color: _hover? Colors.red: Colors.limeAccent,
+                      child: Text('Contact Owner'),
+                      onPressed: () async {
+                        await contactOwner(myController.text);
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                      hoverColor: Colors.red,
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: RaisedButton(
-                    child: Text('Contact Owner'),
-                    onPressed: () async {
-                      await contactOwner(myController.text);
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: RaisedButton(
-                    child: Text('show Dialog'),
-                    onPressed: () async {
-                      await showAlertDialog(context);
-                    },
-                  ),
-                ),
-              ]),
+                ]),
+            if (false)
               Center(
                 child: Text(_homeScreenText),
               ),
-            ],
-          ),
+            if (false)
+              new Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: new RaisedButton(
+                    child: new Text('Show Short Toast'),
+                    onPressed: showShortToast),
+              ),
+            if (false)
+              new Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: new RaisedButton(
+                    child: new Text('Show Top Short Toast'),
+                    onPressed: showTopShortToast),
+              ),
+          ],
         ),
-
+      ),
     );
-  }
-
-  void createRecord() async {
-    await databaseReference
-        .collection("fcm_token")
-        .document("1")
-        .setData({'fcm_token': token, 'license-plate': 'ABCD1234Z'});
-
-    await databaseReference.collection("books").document("1").setData({
-      'title': 'Mastering Flutter',
-      'description': 'Programming Guide for Dart'
-    });
-
-    DocumentReference ref = await databaseReference.collection("books").add({
-      'title': 'Flutter in Action',
-      'description': 'Complete Programming Guide to learn Flutter'
-    });
-    print(ref.documentID);
-  }
-
-  void getData() {
-    databaseReference
-        .collection("books")
-        .getDocuments()
-        .then((QuerySnapshot snapshot) {
-      snapshot.documents.forEach((f) => print('${f.data}}'));
-    });
-  }
-
-  void updateData() {
-    try {
-      databaseReference
-          .collection('books')
-          .document('1')
-          .updateData({'description': 'Head First Flutter'});
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  void deleteData() {
-    try {
-      databaseReference.collection('books').document('1').delete();
-    } catch (e) {
-      print(e.toString());
-    }
   }
 
   getDeviceInfo() async {
@@ -359,48 +224,12 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
-// from onpressed callbacks are async?
-  void addData() async {
-    try {
-//      databaseReference
-//          .collection('fcm_token').add({"textInput":myController.text});
-      databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .setData({"license_plate": myController.text}, merge: true);
-      await databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .setData({"device_info": await _getDeviceInfo()}, merge: true);
-      databaseReference.collection('fcm_token').document(fcmtoken).setData(
-          {"timestamp": DateTime.now().millisecondsSinceEpoch},
-          merge: true);
-      await databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .setData({"fcm_token": await fcmtoken}, merge: true);
-      databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .collection('message')
-          .document('8Cc0R4m4aROYaOF9GrQo')
-          .setData({"license_plate": myController.text}, merge: true);
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
   void getOwner() {
     databaseReference
         .collection("fcm_token")
         .where("license_plate", isEqualTo: myController.text)
         .snapshots()
         .listen((data) => print('Owner: ${data.documents[0]['device_info']}'));
-  }
-
-  Future<void> printSomething() {
-    print("await print");
-    return Future.delayed(Duration(seconds: 3), () => print('Large Latte'));
   }
 
   contactOwner(String licensePlate) async {
@@ -410,182 +239,106 @@ class _MyAppState extends State<MyApp> {
       return;
     }
 
-    var fcmTokenExist = true;
-    print("pre:" + licensePlate ?? "XYZ9876W");
-    var snapshots = await getDocument2(licensePlate);
-    snapshots.documents.forEach((f) {
-      print('doc is ${f["fcm_token"]}');
-//      print('doc is ${f["school"]}');
-      print('doc is ${f["license_plate"]}');
-
-      print('docID is ${f.documentID}');
-      databaseReference
-          .collection('fcm_token')
-          .document(f.documentID)
-          .get()
-          .then((DocumentSnapshot ds) {
-//        print("something" + ds['school'] + ds.documentID);
-        print("something" + ds['license_plate'] + ds.documentID);
-        print(ds.data);
-      });
-      // how to set data?
-      databaseReference
-          .collection('fcm_token')
-          .document(f.documentID)
-          .setData({"year": "2021"}, merge: true);
-      databaseReference
-          .collection('fcm_token')
-          .document(f.documentID)
-          .updateData({
-        "time_stamp": DateTime.now().millisecondsSinceEpoch
-      }).catchError((e) {
-        print(e);
-      });
-    });
-    await printSomething();
-
-    if (fcmTokenExist && false) {
-      print('set timestamp');
-      databaseReference
-          .collection('fcm_token')
-          .document(fcmTokenLocal)
-          .updateData({
-        "time_stamp": DateTime.now().millisecondsSinceEpoch
-      }).catchError((e) {
-        print(e);
-      });
-    }
-    print(' after await fcmtokenlocal: $fcmTokenLocal');
-  }
-
-  Future<QuerySnapshot> getDocument2(String licensePlate) async {
-    return databaseReference
-        .collection("fcm_token")
-//        .where("school", isEqualTo: "Westwood")
-        .where("license_plate", isEqualTo: licensePlate)
-        .getDocuments();
-//        .then((QuerySnapshot snapshot){
-//        print(snapshot.documents);
-    //        docs = snapshot;
-//    });
-  }
-
-  // TODO: Contact car owner usng cloud firestore trigger. automatically add time stamp
-  contactOwner2(String licensePlate) async {
-//    String owner2;
-//    var docs;
-
-//
-    var fcmTokenExist = true;
-    print("pre:" + licensePlate ?? "XYZ9876W");
-    var testvar;
-
-    await databaseReference
+    const msg = {
+      "available": "The owner for licensePlate has been notified.",
+      "not available": "The owner for licensePlate is not registered here.",
+    };
+    databaseReference
         .collection("fcm_token")
         .where("license_plate", isEqualTo: licensePlate)
-        .snapshots()
-        .listen((data) {
-      print(testvar ?? "is null");
-      testvar ??= "someval";
-      print(testvar ?? "is null");
+        .getDocuments()
+        .then((QuerySnapshot snapshots) {
+      if (snapshots.documents.isNotEmpty) {
+        showOwnerContactStatusToast(
+            licensePlate, "The owner for ${licensePlate} has been notified.");
+        snapshots.documents.forEach((f) {
+          databaseReference
+              .collection('fcm_token')
+              .document(f.documentID)
+              .get()
+              .then((DocumentSnapshot ds) {
+            //        print(ds.documentID);
+            print(ds.data);
+          });
+          // how to set data?
 
-      fcmTokenLocal = data.documents[0]['fcm_token'] ?? "XYZ9876W";
-      if (fcmTokenLocal != null) {
-        print('during await fcmtokenlocal: $fcmTokenLocal');
-        print('fcmToken exist');
+          databaseReference
+              .collection('fcm_token')
+              .document(f.documentID)
+              .updateData({
+            "time_stamp": DateTime.now().millisecondsSinceEpoch,
+            "state": "notify",
+          }).catchError((e) {
+            print(e);
+          });
+        });
       } else {
-        fcmTokenExist = false;
-        print('fcmToken does not exist');
+        print(snapshots.documents.isEmpty);
+        showOwnerContactStatusToast(licensePlate,
+            "The owner for ${licensePlate} is not registered here.");
       }
-      print(licensePlate);
     });
-    await printSomething();
-
-    print(testvar);
-    print("post:" + licensePlate);
-    print(' before await fcmtokenlocal: $fcmTokenLocal');
-    if (fcmTokenExist && false) {
-      print('set timestamp');
-      databaseReference
-          .collection('fcm_token')
-          .document(fcmTokenLocal)
-          .updateData({
-        "time_stamp": DateTime.now().millisecondsSinceEpoch
-      }).catchError((e) {
-        print(e);
-      });
-    }
-    print(' after await fcmtokenlocal: $fcmTokenLocal');
-
-//      databaseReference
-//          .collection("fcm_token")
-////          .where("license_plate", isEqualTo: licensePlate)
-//          .getDocuments()
-//          .then((QuerySnapshot snapshot){
-////          print(snapshot.documents);
-//        docs = snapshot;
-//      });
-//      print(docs.document[0]['fcm_token']);
-//      print({docs.documents[0].data['fcm_token']});
-//      print('Owner\'s fcm_token: ${docs.documents[0]['fcm_token']}');
-//      owner2 = docs.documents[0]['fcm_token'];
-//          print('during listen: ${owner2}');
-
-//      print('Owner\'s fcm_token: ${data.documents[0]['time_stamp']}');
   }
 
-//  databaseReference
-//      .collection("fcm_token")
-//      .where("license_plate", isEqualTo: licensePlate)
-//      .snapshots()
-//      .listen((data) {
-//  print('Owner\'s fcm_token: ${data.documents[0]['fcm_token']}');
-//  owner2 = data.documents[0]['fcm_token'];
-//          data.documents[0].
-//          databaseReference
-//              .collection('fcm_token')
-//              .document(data.documents[0]['fcm_token'])
-//              .updateData({"time_stamp":DateTime.now().millisecondsSinceEpoch});
-  // set trigger
-//          data.documents;
-  // documents ref?
-//    print('after listen: ${owner2}');
-//// how to retrieve all fields in a document?
-//     Firestore.instance
-//        .collection('fcm_token')
-//        .where("license_plate", isEqualTo: licensePlate)
-//        .snapshots()
-//        .listen((data) =>
-//        data.documents.forEach((doc) => print(doc["fcm_token"])));
+  void showOwnerContactStatusToast(String licensePlate, String msg) {
+    Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIos: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0);
+  }
 
   // TODO: Add my license plate. automatically add time stamp
-  void addMyData() async {
+  void createData() async {
     try {
+      var licensePlate = myController.text;
+      var data = {
+        "fcm_token": await fcmtoken,
+        "license_plate": licensePlate,
+        "device_info": await _getDeviceInfo(),
+        "time_stamp": DateTime.now().millisecondsSinceEpoch,
+        "msg": "move it",
+        "state": "create",
+      };
+      await databaseReference
+          .collection('fcm_token')
+          .document(fcmtoken)
+          .setData(data, merge: true);
+
+      Fluttertoast.showToast(
+          msg: "Added/Edited License Plate number ${licensePlate}",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIos: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0);
 //      databaseReference
-//          .collection('fcm_token').add({"textInput":myController.text});
-      databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .setData({"license_plate": myController.text}, merge: true);
-      await databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .setData({"device_info": await _getDeviceInfo()}, merge: true);
-      databaseReference.collection('fcm_token').document(fcmtoken).setData(
-          {"timestamp": DateTime.now().millisecondsSinceEpoch},
-          merge: true);
-      await databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .setData({"fcm_token": await fcmtoken}, merge: true);
-      databaseReference
-          .collection('fcm_token')
-          .document(fcmtoken)
-          .collection('message')
-          .document('8Cc0R4m4aROYaOF9GrQo')
-          .setData({"license_plate": myController.text}, merge: true);
+//          .collection('fcm_token')
+//          .document(fcmtoken)
+//          .collection('message')
+//          .document('8Cc0R4m4aROYaOF9GrQo')
+//          .setData({"license_plate": myController.text}, merge: true);
     } catch (e) {
       print(e.toString());
     }
+  }
+
+  void showShortToast() {
+    Fluttertoast.showToast(
+        msg: "This is Short Toast",
+        toastLength: Toast.LENGTH_SHORT,
+        timeInSecForIos: 1);
+  }
+
+  void showTopShortToast() {
+    Fluttertoast.showToast(
+        msg: "This is Top Short Toast",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIos: 1);
   }
 }
